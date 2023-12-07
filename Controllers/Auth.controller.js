@@ -51,3 +51,21 @@ export const Login = async (req, res) => {
         return res.status(500).json({success: false , message: error })
     }
 }
+
+export const getCurrentUser = async (req, res) => {
+    try{
+        const { token } = req.body;
+        if(!token) return res.status(401).json({success:false,message:"Token is required."})
+
+        const {id} = await Jwt.verify(token,process.env.JWT_SECRET)
+
+        const user = await AuthModal.findById(id);
+
+        if(!user) return res.status(401).json({success:false,message:"User not found."})
+
+        return res.status(200).json({success:true , user:{name:user.name,id:user._id}})
+
+    }catch(error){
+        return res.status(500).json({success:false , message: error })
+    }
+}
